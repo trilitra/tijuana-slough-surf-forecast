@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Tijuana Slough Surf Report & Forecast</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f4f8;
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        h3 {
+            color: #34495e;
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+        .form-container {
+            margin: 20px 0;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 0 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        table {
+            width: 60%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        img {
+            max-width: 100%;
+            margin: 20px auto;
+            display: block;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+        .image-container {
+            margin: 10px auto;
+            max-width: 100%;
+        }
+        .image-container img {
+            max-height: 200px;
+            width: auto;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tijuana Slough Surf Report & Forecast</h1>
+        <div class="image-container">
+            <img src="{{ url_for('static', filename='wave_surfer.jpg') }}" alt="Surfer on Wave">
+        </div>
+        <p>Данные получены с буя 46086 рядом с серф-спотом Tijuana Slough, Империал-Бич, Калифорния, США</p>
+
+        <div class="form-container">
+            <form method="post" style="display: inline;">
+                <button type="submit" name="forecast_24">Прогноз на 24 часа</button>
+            </form>
+            <form method="post" style="display: inline;">
+                <button type="submit" name="forecast_week">Прогноз на неделю</button>
+            </form>
+        </div>
+
+        {% if error %}
+        <p class="error">{{ error }}</p>
+        {% endif %}
+
+        {% if forecast_24_data %}
+        <h3>Прогноз на 24 часа (UTC+5)</h3>
+        <table>
+            <tr>
+                <th>Дата и время (UTC+5)</th>
+                <th>Диапазон высоты волн (м)</th>
+            </tr>
+            {% for row in forecast_24_data %}
+            <tr>
+                <td>{{ row.datetime }}</td>
+                <td>{{ row.WVHT_range }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <h3>График прогноза на 24 часа</h3>
+        <img src="data:image/png;base64,{{ plot_24_url }}" alt="Прогноз высоты волн на 24 часа">
+        {% endif %}
+
+        {% if forecast_week_data %}
+        <h3>Прогноз на неделю (UTC+5)</h3>
+        <table>
+            <tr>
+                <th>Дата</th>
+                <th>Диапазон высоты волн (м)</th>
+            </tr>
+            {% for row in forecast_week_data %}
+            <tr>
+                <td>{{ row.date }}</td>
+                <td>{{ row.WVHT_range }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <h3>График прогноза на неделю</h3>
+        <img src="data:image/png;base64,{{ plot_week_url }}" alt="Прогноз высоты волн на неделю">
+        {% endif %}
+
+        <div class="footer">
+            <p><strong>Как получен прогноз:</strong> Прогноз высоты волн создан с использованием модели машинного обучения (линейная регрессия), обученной на исторических данных с буя 46086. Модель учитывает параметры ветра и волн за последние 4 часа для предсказания высоты волн. Нижняя граница диапазона прогноза определена условно (вычтено 0.5 м) на основании логики потери энергии волн при подходе к берегу от буя, расположенного в открытом море.</p>
+        </div>
+    </div>
+</body>
+</html>
