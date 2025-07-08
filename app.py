@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import io
 import base64
 import requests
+import os
 from datetime import timedelta
 
 app = Flask(__name__)
@@ -199,4 +200,5 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))  # Используем порт из переменной окружения или 5000 по умолчанию
+    app.run(host='0.0.0.0', port=port, debug=True)
